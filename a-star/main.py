@@ -19,8 +19,13 @@ def is_solvable(state):
   else: 
    return False
 
+def expand_node(node: Node, frontier): 
 
-def a_star(initial_state, final_state): 
+  blank_position = node.find_target_position(0, node.state)
+
+
+
+def a_star(initial_state, final_state):
   
   if not is_solvable(initial_state): 
     raise Exception('The initial state is unsolvable')
@@ -31,6 +36,10 @@ def a_star(initial_state, final_state):
 
   frontier = [root]
   expanded_nodes = []
+
+  while True: 
+    frontier = sorted(frontier)
+    current_node = frontier.pop(0)
 
 if __name__ == '__main__': 
 
@@ -46,10 +55,11 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]   
   
-  print(Node(initial_state))
+  initial_node = Node(initial_state)
 
-  #unsolvable_state = [
-  #    [8, 1, 2],
-  #    [0, 4, 3],
-  #    [7, 6, 5]
-  #]
+  final_node = Node(final_state)
+
+
+  initial_node.compute_h(final_state)
+  final_node.compute_h(final_state)
+

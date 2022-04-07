@@ -9,10 +9,9 @@ class Node:
     self.parent = None
     self.children = None
 
-
   def find_target_position(self, value, target_state):
-    for (row_idx, state_row) in target_state:
-      for (val_idx, state_value) in state_row:
+    for (row_idx, state_row) in enumerate(target_state):
+      for (val_idx, state_value) in enumerate(state_row):
         if value == state_value: 
           return (row_idx, val_idx)
 
@@ -48,4 +47,18 @@ class Node:
     equality &= self.state == other_node.state
     return equality
 
-
+  def __lt__(self, other_node):
+    assert isinstance(other_node, self.__class__)
+    return self.f() < other_node.f()
+  
+  def __le__(self, other_node):
+    assert isinstance(other_node, self.__class__)
+    return self.f() <= other_node.f()
+  
+  def __gt__(self, other_node):
+    assert isinstance(other_node, self.__class__)
+    return self.f() > other_node.f()
+  
+  def __ge__(self, other_node):
+    assert isinstance(other_node, self.__class__)
+    return self.f() >= other_node.f()
