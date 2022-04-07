@@ -1,4 +1,5 @@
-from node import Node
+import movimentos
+from node import Node, generation_checking
 
 def is_solvable(state): 
   flat_state = []
@@ -19,11 +20,21 @@ def is_solvable(state):
   else: 
    return False
 
-def expand_node(node: Node, frontier): 
+def expand_node(current_node: Node, frontier: list, expanded_nodes: list): 
 
-  blank_position = node.find_target_position(0, node.state)
+  blank_position = current_node.find_target_position(0, current_node.state)
 
+  up_state = movimentos.move_up(blank_position, current_node.state)
+  down_state = movimentos.move_down(blank_position, current_node.state)
+  left_state = movimentos.move_left(blank_position, current_node.state)
+  right_state = movimentos.move_right(blank_position, current_node.state)
 
+  frontier = generation_checking(current_node, up_state, frontier, expanded_nodes)
+  frontier = generation_checking(current_node, down_state, frontier, expanded_nodes)
+  frontier = generation_checking(current_node, left_state, frontier, expanded_nodes)
+  frontier = generation_checking(current_node, right_state, frontier, expanded_nodes)
+
+  return frontier
 
 def a_star(initial_state, final_state):
   
@@ -40,6 +51,12 @@ def a_star(initial_state, final_state):
   while True: 
     frontier = sorted(frontier)
     current_node = frontier.pop(0)
+
+    frontier = expand_node(current_node, frontier, expanded_nodes)
+    expanded_nodes.append(current_node)
+
+    if frontier == [] or current_node == target: 
+      break
 
 if __name__ == '__main__': 
 
@@ -62,4 +79,3 @@ if __name__ == '__main__':
 
   initial_node.compute_h(final_state)
   final_node.compute_h(final_state)
-

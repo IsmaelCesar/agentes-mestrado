@@ -1,4 +1,3 @@
-
 class Node:
 
   def __init__(self, state, parent=None): 
@@ -32,6 +31,13 @@ class Node:
   def f(self):
     return self.g + self.h
 
+  def add_child(self, new_child):
+    assert isinstance(new_child, self.__class__)
+    if self.children is None: 
+      self.children = [new_child]
+    else: 
+      self.children.append(new_child)
+
   def __str__(self):
     node_str = ''
     for state_row in self.state: 
@@ -44,7 +50,7 @@ class Node:
 
   def __eq__(self, other_node):
     equality = isinstance(other_node, self.__class__)
-    equality &= self.state == other_node.state
+    equality = equality and self.state == other_node.state
     return equality
 
   def __lt__(self, other_node):
@@ -62,3 +68,18 @@ class Node:
   def __ge__(self, other_node):
     assert isinstance(other_node, self.__class__)
     return self.f() >= other_node.f()
+
+def generation_checking(current_node: Node, new_state: list, frontier: list, expanded_nodes: list):
+  
+  if new_state is not None:
+
+    generated_node = Node(new_state, parent=current_node)
+    truth_value = generated_node != current_node.parent
+    truth_value = truth_value and generated_node not in expanded_nodes
+    if truth_value:
+      current_node.add_child(generated_node)
+      frontier.append(generated_node)
+    else: 
+      generated_node = None
+
+  return frontier
