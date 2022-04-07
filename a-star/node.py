@@ -3,13 +3,13 @@ class Node:
   def __init__(self, state, parent=None): 
     self.state = state
 
-    self.g = 0 if parent is None else parent.g + 1
+    self.parent = parent
 
-    self.parent = None
+    self.g = 0 if parent is None else parent.g + 1
     self.children = None
 
-  def find_target_position(self, value, target_state):
-    for (row_idx, state_row) in enumerate(target_state):
+  def find_target_position(self, value, state_matrix):
+    for (row_idx, state_row) in enumerate(state_matrix):
       for (val_idx, state_value) in enumerate(state_row):
         if value == state_value: 
           return (row_idx, val_idx)
@@ -69,7 +69,20 @@ class Node:
     assert isinstance(other_node, self.__class__)
     return self.f() >= other_node.f()
 
-def generation_checking(current_node: Node, new_state: list, frontier: list, expanded_nodes: list):
+def generation_checking(current_node: Node, target_node: Node, new_state: list, frontier: list, expanded_nodes: list):
+  """
+    Generates the node based on the new state passed as parameter. Checkin if the generated node is not the same
+    as its parent, and if it has not already been expanded before.
+
+    Args: 
+      current_node: Node being expanded in the current iteration
+      target_node: Node, objective of the search, 
+      new_state: List, multidimentional list to beused to represent the new state generated
+      frontier: The list of nodes to be expaded in the next iterations of the search
+      expanded_nodes: List containin all the nodes that have already been expanded
+    Returns: 
+      An updated frontier 
+  """
   
   if new_state is not None:
 
@@ -77,6 +90,7 @@ def generation_checking(current_node: Node, new_state: list, frontier: list, exp
     truth_value = generated_node != current_node.parent
     truth_value = truth_value and generated_node not in expanded_nodes
     if truth_value:
+      generated_node.compute_h(target_node.state)
       current_node.add_child(generated_node)
       frontier.append(generated_node)
     else: 
