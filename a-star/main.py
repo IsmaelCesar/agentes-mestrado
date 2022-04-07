@@ -1,5 +1,4 @@
-from ctypes.util import find_library
-import movimentos
+import movements
 from node import Node, generation_checking
 
 def is_solvable(state): 
@@ -21,6 +20,28 @@ def is_solvable(state):
   else: 
    return False
 
+
+def print_frontier(frontier): 
+  """
+    Prints the nodes toghether with their costs in the frontier
+  """
+  frontier_str = ''
+  last_node = frontier[-1]
+  for row_idx in range(3): 
+    for node in frontier:
+      for row_value in node.state[row_idx]:
+        frontier_str += f' {str(row_value)} ' if row_value != 0 else ' _ '
+
+      if row_idx == 1:
+        frontier_str += f'  ({str(node.f()).zfill(2)}) '
+        if node != last_node: 
+          frontier_str += '|--->   '
+      else: 
+        frontier_str += '\t\t'
+    
+    frontier_str += '\n'
+  print(frontier_str)
+
 def expand_node(current_node: Node, expanded_nodes: list):
   """
     Expands the node in the current iteration of the A-star algorithm, by generating
@@ -35,10 +56,10 @@ def expand_node(current_node: Node, expanded_nodes: list):
 
   blank_position = current_node.find_target_position(0, current_node.state)
 
-  up_state = movimentos.move_up(blank_position, current_node.state)
-  down_state = movimentos.move_down(blank_position, current_node.state)
-  left_state = movimentos.move_left(blank_position, current_node.state)
-  right_state = movimentos.move_right(blank_position, current_node.state)
+  up_state = movements.move_up(blank_position, current_node.state)
+  down_state = movements.move_down(blank_position, current_node.state)
+  left_state = movements.move_left(blank_position, current_node.state)
+  right_state = movements.move_right(blank_position, current_node.state)
 
   for gen_state in [up_state, down_state, left_state, right_state]:
     current_node = generation_checking(current_node, gen_state, expanded_nodes)
@@ -81,7 +102,7 @@ def a_star(initial_state, final_state):
   while True:
 
     print("The frontier is: ")
-
+    print(frontier)
 
     current_node = frontier.pop(0)
 
@@ -96,9 +117,9 @@ def a_star(initial_state, final_state):
 if __name__ == '__main__': 
 
   initial_state = [
-      [1, 2, 3],
-      [4, 0, 5],
-      [7, 8, 6]
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8]
   ]
 
   final_state = [
@@ -108,8 +129,13 @@ if __name__ == '__main__':
   ]   
   
   initial_node = Node(initial_state)
+  initial_node.compute_h(final_state)
+  
+  intermediate_node = Node(intermediate_state)
+  intermediate_node.compute_h(final_state)
+
   final_node = Node(final_state)
 
-  node_list  = [initial_node, final_node]
-  print(*node_list)
+  node_list  = [initial_node, intermediate_node, final_node]
 
+  a_star(initial_state, final_state)

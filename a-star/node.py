@@ -6,6 +6,7 @@ class Node:
     self.parent = parent
 
     self.g = 0 if parent is None else parent.g + 1
+    self.h = 0
     self.children = None
 
   def find_target_position(self, value, state_matrix):
@@ -17,10 +18,11 @@ class Node:
     raise Exception('Value not found')
 
   def compute_h(self, target_state):
-    distance  = 0
+    #distance  = 0
     self.h = 0
     for (row_idx, state_row) in enumerate(self.state):
       for (num_idx, number) in enumerate(state_row):
+        distance = 0
         if number != 0:
           number_position = (row_idx, num_idx)
           target_position = self.find_target_position(number, target_state)
