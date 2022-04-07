@@ -19,6 +19,19 @@ def is_solvable(state):
   else: 
    return False
 
+
+def a_star(initial_state, final_state): 
+  
+  if not is_solvable(initial_state): 
+    raise Exception('The initial state is unsolvable')
+
+  
+  root = Node(initial_state)
+  target = Node(final_state)
+
+  frontier = [root]
+  expanded_nodes = []
+
 if __name__ == '__main__': 
 
   initial_state = [
@@ -33,11 +46,10 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]   
   
+  print(Node(initial_state))
 
   #unsolvable_state = [
   #    [8, 1, 2],
   #    [0, 4, 3],
   #    [7, 6, 5]
   #]
-
-  print(is_solvable(final_state))
