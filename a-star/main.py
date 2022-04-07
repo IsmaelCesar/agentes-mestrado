@@ -1,3 +1,4 @@
+from ctypes.util import find_library
 import movimentos
 from node import Node, generation_checking
 
@@ -20,18 +21,16 @@ def is_solvable(state):
   else: 
    return False
 
-def expand_node(current_node: Node, target_node: Node, frontier: list, expanded_nodes: list):
+def expand_node(current_node: Node, expanded_nodes: list):
   """
     Expands the node in the current iteration of the A-star algorithm, by generating
     new nodes based on the available operations for the 8-number problem
 
     Args:
       current_node: Node to be expanded in the current iteration,
-      target_node: Node with the objective state of the search
-      frontier: List with all the node to be expanded whilist the target node is not reached
       expaded_nodes: List with all the expaded node throughout the search
     Returns:
-      The frontier updated
+      The current node updated
   """
 
   blank_position = current_node.find_target_position(0, current_node.state)
@@ -41,11 +40,30 @@ def expand_node(current_node: Node, target_node: Node, frontier: list, expanded_
   left_state = movimentos.move_left(blank_position, current_node.state)
   right_state = movimentos.move_right(blank_position, current_node.state)
 
-  frontier = generation_checking(current_node, target_node, up_state, frontier, expanded_nodes)
-  frontier = generation_checking(current_node, target_node, down_state, frontier, expanded_nodes)
-  frontier = generation_checking(current_node, target_node, left_state, frontier, expanded_nodes)
-  frontier = generation_checking(current_node, target_node, right_state, frontier, expanded_nodes)
+  for gen_state in [up_state, down_state, left_state, right_state]:
+    current_node = generation_checking(current_node, gen_state, expanded_nodes)
 
+  return current_node
+
+
+def insert_f(current_node: Node, target_node: Node, frontier: list):
+  """
+    Insert current node's children into the frontier
+
+    Args: 
+      currrent_node: Node of the current iteration of the A-star algorithm
+      forntier: List with the nodes to be expaded whilist the target_state 
+                has not been reached
+      target_node: Node of the target state used to compute the h function
+    Returns:
+      An updated frontier
+  """
+  if current_node.children: 
+    for current_child in current_node.children:
+      current_child.compute_h(target_node.state)
+      frontier.append(current_child)
+    
+    frontier = sorted(frontier)
   return frontier
 
 def a_star(initial_state, final_state):
@@ -60,12 +78,17 @@ def a_star(initial_state, final_state):
   frontier = [root]
   expanded_nodes = []
 
-  while True: 
-    frontier = sorted(frontier)
+  while True:
+
+    print("The frontier is: ")
+
+
     current_node = frontier.pop(0)
 
-    frontier = expand_node(current_node, target, frontier, expanded_nodes)
+    current_node = expand_node(current_node, expanded_nodes)
     expanded_nodes.append(current_node)
+
+    frontier = insert_f(current_node, target, frontier)
 
     if frontier == [] or current_node == target: 
       break
@@ -73,9 +96,9 @@ def a_star(initial_state, final_state):
 if __name__ == '__main__': 
 
   initial_state = [
-      [3, 4, 6],
-      [7, 5, 8],
-      [1, 2, 0]
+      [1, 2, 3],
+      [4, 0, 5],
+      [7, 8, 6]
   ]
 
   final_state = [
@@ -84,10 +107,9 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]   
   
-  initial_node = Node(initial_state, target_state=final_state)
+  initial_node = Node(initial_state)
+  final_node = Node(final_state)
 
-  #final_node = Node(final_state)
+  node_list  = [initial_node, final_node]
+  print(*node_list)
 
-
-  #initial_node.compute_h(final_state)
-  #final_node.compute_h(final_state)

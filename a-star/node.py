@@ -48,6 +48,10 @@ class Node:
       node_str += '\n'
     return node_str
 
+  def __repr__(self):
+    return self.__str__()
+
+
   def __eq__(self, other_node):
     equality = isinstance(other_node, self.__class__)
     equality = equality and self.state == other_node.state
@@ -69,19 +73,17 @@ class Node:
     assert isinstance(other_node, self.__class__)
     return self.f() >= other_node.f()
 
-def generation_checking(current_node: Node, target_node: Node, new_state: list, frontier: list, expanded_nodes: list):
+def generation_checking(current_node: Node, new_state: list, expanded_nodes: list):
   """
     Generates the node based on the new state passed as parameter. Checkin if the generated node is not the same
     as its parent, and if it has not already been expanded before.
 
     Args: 
       current_node: Node being expanded in the current iteration
-      target_node: Node, objective of the search, 
       new_state: List, multidimentional list to beused to represent the new state generated
-      frontier: The list of nodes to be expaded in the next iterations of the search
       expanded_nodes: List containin all the nodes that have already been expanded
     Returns: 
-      An updated frontier 
+      An updated current_node 
   """
   
   if new_state is not None:
@@ -90,10 +92,8 @@ def generation_checking(current_node: Node, target_node: Node, new_state: list, 
     truth_value = generated_node != current_node.parent
     truth_value = truth_value and generated_node not in expanded_nodes
     if truth_value:
-      generated_node.compute_h(target_node.state)
       current_node.add_child(generated_node)
-      frontier.append(generated_node)
     else: 
       generated_node = None
 
-  return frontier
+  return current_node
