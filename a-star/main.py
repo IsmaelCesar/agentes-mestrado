@@ -126,16 +126,6 @@ if __name__ == '__main__':
       [1, 2, 3],
       [4, 5, 6],
       [7, 8, 0]
-  ]   
-  
-  initial_node = Node(initial_state)
-  initial_node.compute_h(final_state)
-  
-  intermediate_node = Node(intermediate_state)
-  intermediate_node.compute_h(final_state)
-
-  final_node = Node(final_state)
-
-  node_list  = [initial_node, intermediate_node, final_node]
+  ]
 
   a_star(initial_state, final_state)
