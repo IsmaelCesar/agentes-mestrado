@@ -21,14 +21,29 @@ def is_solvable(state):
   else: 
    return False
 
-def print_frontier(frontier): 
+def frontier_to_grid(frontier, n_cols=3):
+  grid = [[]] 
+  # indexer_for the frontier
+  col_counter = 0
+  for f_node in frontier:
+    grid[-1].append(f_node)
+    col_counter += 1
+    if col_counter == n_cols: 
+      col_counter = 0 
+      grid.append([])
+
+  if [] in grid:
+    grid.remove([])
+
+  return grid
+
+def print_gridrow(grid_row, last_node): 
   """
     Prints the nodes toghether with their costs in the frontier
   """
   frontier_str = ''
-  last_node = frontier[-1]
-  for row_idx in range(3): 
-    for node in frontier:
+  for row_idx in range(3):
+    for node in grid_row:
       for row_value in node.state[row_idx]:
         frontier_str += f' {str(row_value)} ' if row_value != 0 else ' _ '
 
@@ -41,6 +56,17 @@ def print_frontier(frontier):
     
     frontier_str += '\n'
   print(frontier_str)
+
+
+def print_grid(frontier):
+  """
+    Turn the forntier in to a grid and prints the grid
+  """
+  grid = frontier_to_grid(frontier)
+
+  last_element = grid[-1][-1]
+  for grid_row in grid: 
+    print_gridrow(grid_row, last_element)
 
 def build_solution(node: Node):
   """
@@ -119,7 +145,7 @@ def a_star(initial_state, final_state):
   while True:
 
     print("The frontier is: ")
-    print_frontier(frontier)
+    print_grid(frontier)
 
     current_node = frontier.pop(0)
 
@@ -135,9 +161,9 @@ def a_star(initial_state, final_state):
 if __name__ == '__main__': 
 
   initial_state = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8]
+      [5, 4, 6],
+      [1, 8, 0],
+      [7, 3, 2]
   ]
 
   final_state = [
@@ -152,6 +178,6 @@ if __name__ == '__main__':
   print("The solution is:")
   cost = 0
   for node in solution:
-    cost += node.f()
-  print('Total cost: ', cost)
-  print_frontier(solution)
+    cost += node.g
+  print('Total cost: ', found_node.g)
+  print_grid(solution)
