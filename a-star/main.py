@@ -169,9 +169,9 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt'):
 if __name__ == '__main__': 
 
   initial_state = [
-      [5, 4, 6],
-      [1, 8, 0],
-      [7, 3, 2]
+      [1, 2, 3],
+      [4, 5, 8],
+      [6, 7, 0]
   ]
 
   final_state = [
