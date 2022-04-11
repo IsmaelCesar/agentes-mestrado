@@ -1,7 +1,23 @@
+import os
 import copy
 import movements
 from node import Node, generation_checking
 
+
+def write_message_into_file(filename, message):
+  """
+    Checks if the file exists. If not creates it and then writes
+    the message into it
+  """
+
+  mode = 'a+'
+
+  if not os.path.exists(filename):
+    mode = 'w+'
+
+  with open(filename, mode) as f:
+        f.write(message)
+        
 def is_solvable(state): 
   flat_state = []
   
@@ -37,44 +53,7 @@ def frontier_to_grid(frontier, n_cols=3):
 
   return grid
 
-def print_gridrow(grid_row, last_node, write_file=False, filename='a-star.txt', is_solution=False): 
-  """
-    Prints the nodes toghether with their costs in the frontier
-  """
-  frontier_str = ''
-  for row_idx in range(3):
-    for node in grid_row:
-      for row_value in node.state[row_idx]:
-        frontier_str += f' {str(row_value)} ' if row_value != 0 else ' _ '
-
-      if row_idx == 1:
-        frontier_str += f'  ({str(node.f()).zfill(2)}) '
-        if node != last_node: 
-          frontier_str +=  '   ;\t' if not is_solution else '|--->   '
-      else: 
-        frontier_str += '\t\t'
-    
-    frontier_str += '\n'
-
-  print(frontier_str)
-
-  if write_file: 
-    with open(filename, 'a+') as f: 
-      f.write(frontier_str)
-
-
-def print_grid(frontier, write_file=False, filename='a-star.txt', is_solution=False):
-  """
-    Turn the forntier in to a grid and prints the grid
-  """
-  grid = frontier_to_grid(frontier)
-
-  last_element = grid[-1][-1]
-  for grid_row in grid: 
-    print_gridrow(grid_row, last_element, write_file=write_file, filename=filename, is_solution=is_solution)
-
-
-def print_frontier(frontier, step=3, write_file=False, filename='a-star.txt', is_solution=False):
+def print_frontier(frontier, step=3, write_file=False, verbose=False, filename='a-star.txt', is_solution=False):
 
   frontier_str = ''
   last_node = frontier[-1]
@@ -93,7 +72,10 @@ def print_frontier(frontier, step=3, write_file=False, filename='a-star.txt', is
       frontier_str += '\n'
     frontier_str += '\n'
 
-  print(frontier_str)
+  if verbose:
+    print(frontier_str)
+  if write_file:
+    write_message_into_file(filename, frontier_str)
   
 
 def expand_node(current_node: Node, expanded_nodes: list):
@@ -158,13 +140,14 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
   expanded_nodes = []
 
   while True:
-
+    
+    message = "The frontier is: \n"
     if verbose:
-      print("The frontier is: ")
-      if write_file: 
-        with open(filename, 'a+') as f:
-          f.write("The frontier is: \n")
-      print_frontier(frontier, write_file=write_file, filename=filename)
+      print(message)
+    if write_file:
+      write_message_into_file(filename, message)
+
+    print_frontier(frontier, write_file=write_file, filename=filename)
 
     current_node = frontier.pop(0)
 
@@ -176,9 +159,15 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
     if frontier == [] or current_node == target: 
       break
 
-  print("The solution is: ")
-  print('Total cost:', current_node.g )
-  print_frontier(current_node.path_to_root, is_solution=True)
+  message = "The solution is: \n\n"
+  message += f"Total cost: {current_node.g}\n"
+
+  if verbose: 
+    print(message)
+  if write_file:
+    write_message_into_file(filename, message)
+
+  print_frontier(current_node.path_to_root, write_file=write_file, verbose=verbose, is_solution=True)
 
   return current_node.path_to_root
 
@@ -200,4 +189,4 @@ if __name__ == '__main__':
   #final_node = Node(final_state)
   #f = [init_node]*20 + [final_node]
   #print_frontier(f)
-  found_node = a_star(initial_state, final_state, write_file=False, verbose=True)
+  found_node = a_star(initial_state, final_state, write_file=True, verbose=False)
