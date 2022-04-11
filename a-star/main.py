@@ -170,9 +170,9 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
 if __name__ == '__main__': 
 
   initial_state = [
-      [8, 7, 6],
-      [5, 4, 3],
-      [2, 1, 0]
+      [1, 2, 3],
+      [4, 5, 8],
+      [6, 7, 0]
   ]
 
   final_state = [
@@ -181,7 +181,7 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  found_node = a_star(initial_state, final_state, write_file=True, verbose=False)
+  found_node = a_star(initial_state, final_state, write_file=True, verbose=True)
 
   solution = build_solution(found_node)
   print("The solution is:")
