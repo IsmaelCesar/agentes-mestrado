@@ -4,10 +4,14 @@ class Node:
     self.state = state
 
     self.parent = parent
-
-    self.g = 0 if parent is None else parent.g + 1
     self.h = 0
-    self.children = None
+
+    if parent is None:
+      self.path_to_root = [self]
+      self.g = 0
+    else:
+      self.path_to_root = parent.path_to_root + [self]
+      self.g = parent.g + 1
 
   def find_target_position(self, value, state_matrix):
     for (row_idx, state_row) in enumerate(state_matrix):
@@ -18,7 +22,6 @@ class Node:
     raise Exception('Value not found')
 
   def compute_h(self, target_state):
-    #distance  = 0
     self.h = 0
     for (row_idx, state_row) in enumerate(self.state):
       for (num_idx, number) in enumerate(state_row):
@@ -32,13 +35,6 @@ class Node:
 
   def f(self):
     return self.g + self.h
-
-  def add_child(self, new_child):
-    assert isinstance(new_child, self.__class__)
-    if self.children is None: 
-      self.children = [new_child]
-    else: 
-      self.children.append(new_child)
 
   def __str__(self):
     node_str = ''
@@ -94,8 +90,6 @@ def generation_checking(current_node: Node, new_state: list, expanded_nodes: lis
     truth_value = generated_node != current_node.parent
     truth_value = truth_value and generated_node not in expanded_nodes
     if truth_value:
-      current_node.add_child(generated_node)
-    else: 
-      generated_node = None
+      return generated_node
 
-  return current_node
+  return None

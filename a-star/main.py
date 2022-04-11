@@ -37,7 +37,7 @@ def frontier_to_grid(frontier, n_cols=3):
 
   return grid
 
-def print_gridrow(grid_row, last_node, write_file=True, filename='a-star.txt'): 
+def print_gridrow(grid_row, last_node, write_file=False, filename='a-star.txt', is_solution=False): 
   """
     Prints the nodes toghether with their costs in the frontier
   """
@@ -50,7 +50,7 @@ def print_gridrow(grid_row, last_node, write_file=True, filename='a-star.txt'):
       if row_idx == 1:
         frontier_str += f'  ({str(node.f()).zfill(2)}) '
         if node != last_node: 
-          frontier_str += '|--->   '
+          frontier_str +=  '   ;\t' if not is_solution else '|--->   '
       else: 
         frontier_str += '\t\t'
     
@@ -63,7 +63,7 @@ def print_gridrow(grid_row, last_node, write_file=True, filename='a-star.txt'):
       f.write(frontier_str)
 
 
-def print_grid(frontier, write_file=False, filename='a-star.txt'):
+def print_grid(frontier, write_file=False, filename='a-star.txt', is_solution=False):
   """
     Turn the forntier in to a grid and prints the grid
   """
@@ -71,22 +71,30 @@ def print_grid(frontier, write_file=False, filename='a-star.txt'):
 
   last_element = grid[-1][-1]
   for grid_row in grid: 
-    print_gridrow(grid_row, last_element, write_file=write_file, filename=filename)
+    print_gridrow(grid_row, last_element, write_file=write_file, filename=filename, is_solution=is_solution)
 
-def build_solution(node: Node):
-  """
-    Given a node, prints the entire path to it from the root
-  """
-  solution = []
-  while True:
-    
-    solution.append(node)
-    node = node.parent
 
-    if node is None:
-      break
-  solution = list(reversed(solution))
-  return solution
+def print_frontier(frontier, step=3, write_file=False, filename='a-star.txt', is_solution=False):
+
+  frontier_str = ''
+  last_node = frontier[-1]
+  for step_idx in range(0, len(frontier), step):
+    for row_idx in range(3):
+      for node in frontier[step_idx: step_idx+step]:
+        for row_value in node.state[row_idx]:
+          frontier_str += f' {str(row_value)} ' if row_value != 0 else ' _ '
+
+        if row_idx == 1:
+          frontier_str += f'  ({str(node.f()).zfill(2)}) '
+          if node != last_node: 
+            frontier_str +=  '   ;\t' if not is_solution else '|--->   '
+        else: 
+          frontier_str += '\t\t'
+      frontier_str += '\n'
+    frontier_str += '\n'
+
+  print(frontier_str)
+  
 
 def expand_node(current_node: Node, expanded_nodes: list):
   """
@@ -97,7 +105,7 @@ def expand_node(current_node: Node, expanded_nodes: list):
       current_node: Node to be expanded in the current iteration,
       expaded_nodes: List with all the expaded node throughout the search
     Returns:
-      The current node updated
+      A list for the generated nodes
   """
 
   blank_position = current_node.find_target_position(0, current_node.state)
@@ -107,10 +115,12 @@ def expand_node(current_node: Node, expanded_nodes: list):
   left_state = movements.move_left(blank_position, copy.deepcopy(current_node.state))
   right_state = movements.move_right(blank_position, copy.deepcopy(current_node.state))
 
+  generated_nodes = []
   for gen_state in [up_state, down_state, left_state, right_state]:
-    current_node = generation_checking(current_node, gen_state, expanded_nodes)
-
-  return current_node
+    gen_node = generation_checking(current_node, gen_state, expanded_nodes)
+    if gen_node: 
+      generated_nodes.append(gen_node)
+  return generated_nodes
 
 
 def insert_f(node_list: list, target_node: Node, frontier: list):
@@ -154,25 +164,30 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
       if write_file: 
         with open(filename, 'a+') as f:
           f.write("The frontier is: \n")
-      print_grid(frontier, write_file=write_file, filename=filename)
+      print_frontier(frontier, write_file=write_file, filename=filename)
 
     current_node = frontier.pop(0)
 
-    current_node = expand_node(current_node, expanded_nodes)
+    generated_nodes = expand_node(current_node, expanded_nodes)
     expanded_nodes.append(current_node)
 
-    frontier = insert_f(current_node.children, target, frontier)
+    frontier = insert_f(generated_nodes, target, frontier)
 
     if frontier == [] or current_node == target: 
       break
-  return current_node
+
+  print("The solution is: ")
+  print('Total cost:', current_node.g )
+  print_frontier(current_node.path_to_root, is_solution=True)
+
+  return current_node.path_to_root
 
 if __name__ == '__main__': 
 
   initial_state = [
-      [1, 2, 3],
-      [4, 5, 8],
-      [6, 7, 0]
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8]
   ]
 
   final_state = [
@@ -181,15 +196,8 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  found_node = a_star(initial_state, final_state, write_file=True, verbose=True)
-
-  solution = build_solution(found_node)
-  print("The solution is:")
-  cost = 0
-  for node in solution:
-    cost += node.g
-  print('Total cost: ', found_node.g)
-  with open('a-star.txt', 'a+') as f:
-        f.write("The Solution is: \n")
-        f.write(f"Total cost: {found_node.g} \n")
-  print_grid(solution, write_file=True)
+  #init_node = Node(initial_state)
+  #final_node = Node(final_state)
+  #f = [init_node]*20 + [final_node]
+  #print_frontier(f)
+  found_node = a_star(initial_state, final_state, write_file=False, verbose=True)
