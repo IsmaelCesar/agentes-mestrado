@@ -37,7 +37,7 @@ def frontier_to_grid(frontier, n_cols=3):
 
   return grid
 
-def print_gridrow(grid_row, last_node): 
+def print_gridrow(grid_row, last_node, write_file=True, filename='a-star.txt'): 
   """
     Prints the nodes toghether with their costs in the frontier
   """
@@ -55,10 +55,15 @@ def print_gridrow(grid_row, last_node):
         frontier_str += '\t\t'
     
     frontier_str += '\n'
+
   print(frontier_str)
 
+  if write_file: 
+    with open(filename, 'a+') as f: 
+      f.write(frontier_str)
 
-def print_grid(frontier):
+
+def print_grid(frontier, write_file=False, filename='a-star.txt'):
   """
     Turn the forntier in to a grid and prints the grid
   """
@@ -66,7 +71,7 @@ def print_grid(frontier):
 
   last_element = grid[-1][-1]
   for grid_row in grid: 
-    print_gridrow(grid_row, last_element)
+    print_gridrow(grid_row, last_element, write_file=write_file, filename=filename)
 
 def build_solution(node: Node):
   """
@@ -128,7 +133,7 @@ def insert_f(node_list: list, target_node: Node, frontier: list):
     frontier = sorted(frontier)
   return frontier
 
-def a_star(initial_state, final_state):
+def a_star(initial_state, final_state, write_file=False, filename='a-star.txt'):
   
   if not is_solvable(initial_state): 
     raise Exception('The initial state is unsolvable')
@@ -145,7 +150,10 @@ def a_star(initial_state, final_state):
   while True:
 
     print("The frontier is: ")
-    print_grid(frontier)
+    if write_file: 
+      with open(filename, 'a+') as f:
+        f.write("The frontier is: \n")
+    print_grid(frontier, write_file=write_file, filename=filename)
 
     current_node = frontier.pop(0)
 
@@ -172,7 +180,7 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  found_node = a_star(initial_state, final_state)
+  found_node = a_star(initial_state, final_state, write_file=True)
 
   solution = build_solution(found_node)
   print("The solution is:")
@@ -180,4 +188,7 @@ if __name__ == '__main__':
   for node in solution:
     cost += node.g
   print('Total cost: ', found_node.g)
-  print_grid(solution)
+  with open('a-star.txt', 'a+') as f:
+        f.write("The Solution is: \n")
+        f.write(f"Total cost: {found_node.g} \n")
+  print_grid(solution, write_file=True)
