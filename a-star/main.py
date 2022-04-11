@@ -133,7 +133,7 @@ def insert_f(node_list: list, target_node: Node, frontier: list):
     frontier = sorted(frontier)
   return frontier
 
-def a_star(initial_state, final_state, write_file=False, filename='a-star.txt'):
+def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', verbose=True):
   
   if not is_solvable(initial_state): 
     raise Exception('The initial state is unsolvable')
@@ -149,11 +149,12 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt'):
 
   while True:
 
-    print("The frontier is: ")
-    if write_file: 
-      with open(filename, 'a+') as f:
-        f.write("The frontier is: \n")
-    print_grid(frontier, write_file=write_file, filename=filename)
+    if verbose:
+      print("The frontier is: ")
+      if write_file: 
+        with open(filename, 'a+') as f:
+          f.write("The frontier is: \n")
+      print_grid(frontier, write_file=write_file, filename=filename)
 
     current_node = frontier.pop(0)
 
@@ -169,9 +170,9 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt'):
 if __name__ == '__main__': 
 
   initial_state = [
-      [1, 2, 3],
-      [4, 5, 8],
-      [6, 7, 0]
+      [8, 7, 6],
+      [5, 4, 3],
+      [2, 1, 0]
   ]
 
   final_state = [
@@ -180,7 +181,7 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  found_node = a_star(initial_state, final_state, write_file=True)
+  found_node = a_star(initial_state, final_state, write_file=True, verbose=False)
 
   solution = build_solution(found_node)
   print("The solution is:")
