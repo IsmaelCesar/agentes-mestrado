@@ -4,16 +4,17 @@ import movements
 from node import Node, generation_checking
 
 
-def write_message_into_file(filename, message):
+def write_message_into_file(filename, message, mode=None):
   """
     Checks if the file exists. If not creates it and then writes
     the message into it
   """
 
-  mode = 'a+'
-
-  if not os.path.exists(filename):
-    mode = 'w+'
+  if not mode:
+    if not os.path.exists(filename):
+      mode = 'w+'
+    else: 
+      mode = 'a+'
 
   with open(filename, mode) as f:
         f.write(message)
@@ -37,22 +38,6 @@ def is_solvable(state):
   else: 
    return False
 
-def frontier_to_grid(frontier, n_cols=3):
-  grid = [[]] 
-  # indexer_for the frontier
-  col_counter = 0
-  for f_node in frontier:
-    grid[-1].append(f_node)
-    col_counter += 1
-    if col_counter == n_cols: 
-      col_counter = 0 
-      grid.append([])
-
-  if [] in grid:
-    grid.remove([])
-
-  return grid
-
 def print_frontier(frontier, step=3, write_file=False, verbose=False, filename='a-star.txt', is_solution=False):
 
   frontier_str = ''
@@ -66,7 +51,7 @@ def print_frontier(frontier, step=3, write_file=False, verbose=False, filename='
         if row_idx == 1:
           frontier_str += f'  ({str(node.f()).zfill(2)}) '
           if node != last_node: 
-            frontier_str +=  '   ;\t' if not is_solution else '|--->   '
+            frontier_str +=  '   ;\t' if not is_solution else '|--->\t'
         else: 
           frontier_str += '\t\t'
       frontier_str += '\n'
@@ -174,9 +159,9 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
 if __name__ == '__main__': 
 
   initial_state = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8]
+      [1, 8, 2],
+      [0, 4, 3],
+      [7, 6, 5]
   ]
 
   final_state = [
@@ -185,8 +170,4 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  #init_node = Node(initial_state)
-  #final_node = Node(final_state)
-  #f = [init_node]*20 + [final_node]
-  #print_frontier(f)
   found_node = a_star(initial_state, final_state, write_file=True, verbose=False)
