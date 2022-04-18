@@ -132,7 +132,7 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
     if write_file:
       write_message_into_file(filename, message)
 
-    print_frontier(frontier, write_file=write_file, filename=filename)
+    print_frontier(frontier, write_file=write_file, verbose=verbose, filename=filename)
 
     current_node = frontier.pop(0)
 
@@ -152,7 +152,7 @@ def a_star(initial_state, final_state, write_file=False, filename='a-star.txt', 
   if write_file:
     write_message_into_file(filename, message)
 
-  print_frontier(current_node.path_to_root, write_file=write_file, verbose=verbose, is_solution=True)
+  print_frontier(current_node.path_to_root, write_file=write_file, verbose=verbose, filename=filename, is_solution=True)
 
   return current_node.path_to_root
 
@@ -170,4 +170,4 @@ if __name__ == '__main__':
       [7, 8, 0]
   ]
 
-  found_node = a_star(initial_state, final_state, write_file=True, verbose=False)
+  found_node = a_star(initial_state, final_state, write_file=False, verbose=True, filename='init-state-lista.txt')
