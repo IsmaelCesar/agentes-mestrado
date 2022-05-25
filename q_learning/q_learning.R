@@ -93,4 +93,7 @@ print(q_matrix)
 print('POLITICA:')
 policy <- max.col(q_matrix)
 
-
+s1 = paste(actions_names[policy[5]], "+10")
+s2 = paste(actions_names[policy[3]], actions_names[policy[4]])
+s3 = paste(actions_names[policy[1]], actions_names[policy[2]])
+cat('\n', s1, '\n', s2, '\n', s3)
